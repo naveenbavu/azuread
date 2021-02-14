@@ -1,0 +1,35 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy container app to Azure Web App - azurepractisewebapp
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: 'ubuntu-latest'
+
+    steps:
+    - uses: actions/checkout@master
+
+    - uses: azure/docker-login@v1
+      with:
+        login-server: https://azurepractisecr.azurecr.io/
+        username: ${{ secrets.AzureAppService_ContainerUsername_60d262a67f14478eba8c5c5da4a2a9f0 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_b241eebca05c4aa080acb9e0e56cfc34 }}
+
+    - run: |
+        docker build . -t azurepractisecr.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_60d262a67f14478eba8c5c5da4a2a9f0 }}/spring-boot-docker:${{ github.sha }}
+        docker push azurepractisecr.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_60d262a67f14478eba8c5c5da4a2a9f0 }}/spring-boot-docker:${{ github.sha }}
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'azurepractisewebapp'
+        slot-name: 'production'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_bf75ca0083404caa834524ea56b25ba8 }}
+        images: 'azurepractisecr.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_60d262a67f14478eba8c5c5da4a2a9f0 }}/spring-boot-docker:${{ github.sha }}'
