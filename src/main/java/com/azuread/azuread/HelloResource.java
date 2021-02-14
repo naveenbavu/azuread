@@ -13,7 +13,7 @@ public class HelloResource {
 
   @RequestMapping("home")
   public String get(@AuthenticationPrincipal(expression = "claims['name']") String name){
-    return String.format("Welcome %s! for joining first Azure Security Tutorial", name);
+    return String.format("Welcome %s! for1 joining first Azure Security Tutorial", name);
 
   }
 
